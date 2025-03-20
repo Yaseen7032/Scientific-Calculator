@@ -1,43 +1,24 @@
-const cacheName = "tic-tac-toe-v2";
-const assets = [
-    "/",
-    "/index.html",
-    "/style.css",
-    "/script.js",
-    "/icon.png",
-    "/manifest.json"
+const CACHE_NAME = "calculator-cache-v1";
+const urlsToCache = [
+    "index.html",
+    "style.css",
+    "script.js",
+    "icon.png",
+    "icon.png"
 ];
 
-// Install event - cache files
 self.addEventListener("install", event => {
     event.waitUntil(
-        caches.open(cacheName).then(cache => {
-            return cache.addAll(assets);
+        caches.open(CACHE_NAME).then(cache => {
+            return cache.addAll(urlsToCache);
         })
     );
 });
 
-// Activate event - cleanup old caches
-self.addEventListener("activate", event => {
-    event.waitUntil(
-        caches.keys().then(keys => {
-            return Promise.all(
-                keys.filter(key => key !== cacheName).map(key => caches.delete(key))
-            );
-        })
-    );
-});
-
-// Fetch event - serve from cache first, then network
 self.addEventListener("fetch", event => {
     event.respondWith(
         caches.match(event.request).then(response => {
-            return response || fetch(event.request).then(fetchResponse => {
-                return caches.open(cacheName).then(cache => {
-                    cache.put(event.request, fetchResponse.clone());
-                    return fetchResponse;
-                });
-            });
-        }).catch(() => caches.match("/index.html")) // Load index.html if offline
+            return response || fetch(event.request);
+        })
     );
 });
